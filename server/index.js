@@ -1,37 +1,60 @@
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
-// const HttpStatus = require("http-status");
-// const ApiError = require("./src/utils/apiError");
-// const { errorConverter, errorHandler } = require("./middlewares/error.js");
-const routes = require("./src/routes/index");
+const routes = require("./src/routes");
 require("dotenv/config.js");
+const Strategy = require("./src/strategy");
+const passport = require("passport");
 
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-// app.get("/", (req, res, next) => {
-//   res.status(HttpStatus.OK).send("Welcome to Ticket Management System");
-// });
-
-app.use("/", routes);
-
-// catch 404 and forward to error handler
-// app.use((req, res, next) => {
-//   const err = new ApiError(HttpStatus.NOT_FOUND, "Api not found");
-//   return next(err);
-// });
-
-// convert error to ApiError, if needed
-// app.use(errorConverter);
-
-// handle error
-// app.use(errorHandler);
+var logger = require("morgan");
+const session = require("express-session");
+const MongoStore = require("connect-mongo");
+const path = require("path");
 
 const mongoUrl = process.env.DB_URL;
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT ||  5001;
 
+const app = express();
+app.use(logger('dev')); // Logging middleware
+app.use(
+  cors({
+    origin: ["http://localhost:3000", process.env.CORS_ORIGIN],
+    methods: "GET,POST,PUT,DELETE",
+    credentials: true,
+  })
+);// CORS middleware
+app.use(express.json()); // JSON parsing middleware
+app.use(express.urlencoded({ extended: true })); // URL-encoded parsing middleware
+app.use(express.static(path.join(__dirname, "public"))); // Static files middleware
+
+// Session middleware
+app.use(session({
+  secret: 'your-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: mongoUrl,
+    collectionName: 'sessions'
+  })
+}));
+
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Serialize and deserialize user
+passport.serializeUser(function (user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function (obj, done) {
+  done(null, obj);
+});
+
+// Routes
+app.use("/", routes);
+
+// Database connection
 mongoose
   .connect(mongoUrl)
   .then(() => console.log(`Successfully connected to MongoDB`))
@@ -39,6 +62,7 @@ mongoose
     console.error(`Connection to "${mongoUrl}" failed because ${err.message}`)
   );
 
+// Start the server
 app.listen(PORT, () => console.log(`Server started on ${PORT}`));
 
-module.exports = app; 
+module.exports = app;

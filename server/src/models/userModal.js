@@ -8,13 +8,24 @@ const userSchema = new mongoose.Schema(
       unique:true,
       required: true,
     },
-    phone : { type : Number, unique : true},
+    phone : { type : Number},
     name: {
       type: String,
     },
+    userId : { type : Number, unique : true, ref : "signupWithSocialApp",
+    sparse: true },// This allows multiple documents to have a null value for this field},
+    profilePicUrl: {
+      type: String,
+    },
+    userSignupWith: {
+        type: String,
+        enum: ["Email", "Google", "Facebook"],
+        default: "Email",
+      },
+
     role: {
       type: String,
-      enum: ["super_admin", "user"],
+      enum: ["super_user", "user"],
       default: "user",
     },
     password: {
@@ -24,7 +35,19 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    ticketHistoy: [{}],
+    is_blocked: {
+      type: Boolean,
+      default: false,
+    },
+    is_otpVerified: {
+      type: Boolean,
+      default: false,
+    },
+    otp : { type : String},
+    // otpExpiry: {
+    //   type: Date,
+    //   index: { expires: '15m', sparse: true } 
+    // },
  },
  { timestamps: true }
 );
@@ -32,17 +55,18 @@ const userSchema = new mongoose.Schema(
 const User = mongoose.model("users", userSchema);
 
 const superAdmin = async () => {
- const isExist = await User.findOne({ role: "super_admin" });
+ const isExist = await User.findOne({ role: "super_user" });
  if (!isExist) {
     let obj = {
-      email: "superadmin@gmail.com",
-      name: "Super Admin",
-      password: bcrypt.hashSync("SuperAdmin@123", 5),
+      email: "1@gmail.com",
+      name: "Testing User",
+      password: bcrypt.hashSync("1", 5),
       phone: "1234567890",
-      role: "super_admin",
+      role: "super_user",
+      is_otpVerified:  true,
     };
     await User.create(obj);
-    console.log("Super Admin Created ");
+    console.log("Test User Created ");
  } 
 };
 

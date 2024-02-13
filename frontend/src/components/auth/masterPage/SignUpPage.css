@@ -1,0 +1,162 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+.sign-up {
+  background-color: #ffffff;
+  height: 100vh;
+  position: relative;
+  width: 100vw;
+}
+.sign-up .container {
+  background-color: #ffffff;
+  border-radius: 4px;
+  height: 409px;
+  left: 166px;
+  position: absolute;
+  top: 256px;
+  width: 439px;
+}
+.sign-up .container .overlap-group {
+  height: 396px;
+  left: 4px;
+  position: relative;
+  top: 6px;
+  width: 431px;
+}
+.sign-up .container .overlap-group .rectangle {
+  border: 3px solid;
+  border-color: #d9cbf6;
+  border-radius: 24px;
+  height: 257px;
+  left: 190px;
+  position: absolute;
+  top: 51px;
+  width: 223px;
+}
+.sign-up .container .overlap-group .div {
+  border: 3px solid;
+  border-color: #d9cbf6;
+  border-radius: 24px;
+  height: 116px;
+  left: 17px;
+  position: absolute;
+  top: 99px;
+  width: 149px;
+}
+.sign-up .container .overlap-group .image {
+  height: 89px;
+  left: 342px;
+  position: absolute;
+  top: 0;
+  width: 89px;
+}
+.sign-up .container .overlap-group .img {
+  height: 60px;
+  left: 0;
+  position: absolute;
+  top: 69px;
+  width: 60px;
+}
+.sign-up .container .overlap-group .oval {
+  height: 30px;
+  left: 335px;
+  position: absolute;
+  top: 361px;
+  width: 30px;
+}
+.sign-up .container .overlap-group .oval-2 {
+  height: 16px;
+  left: 111px;
+  position: absolute;
+  top: 25px;
+  width: 16px;
+}
+.sign-up .container .overlap-group .image-2 {
+  height: 375px;
+  left: 41px;
+  position: absolute;
+  top: 22px;
+  width: 324px;
+}
+.sign-up .container .overlap-group .image-3 {
+  height: 80px;
+  left: 1px;
+  position: absolute;
+  top: 250px;
+  width: 80px;
+}
+.sign-up .container .overlap-group .image-4 {
+  height: 50px;
+  left: 312px;
+  position: absolute;
+  top: 119px;
+  width: 59px;
+}
+
+
+
+.sign-up .container-3 {
+  background-color: #ffffff;
+  box-shadow: 0px 2px 5px #171a1f17, 0px 0px 2px #171a1f1f;
+  height: 64px;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 1440px;
+}
+.sign-up .container-3 .globe {
+  height: 20px;
+  left: 1304px;
+  position: absolute;
+  top: 21px;
+  width: 20px;
+  cursor: pointer;
+}
+.sign-up .container-3 .overlap {
+  height: 30px;
+  left: 114px;
+  position: absolute;
+  top: 16px;
+  width: 54px;
+}
+.sign-up .container-3 .overlap .oval-3 {
+  height: 6px;
+  left: 40px;
+  position: absolute;
+  top: 5px;
+  width: 6px;
+  cursor: pointer;
+}
+.sign-up .container-3 .overlap .text-wrapper-10 {
+  color: #171a1f;
+  font-family: "Epilogue-Bold", Helvetica;
+  font-size: 20px;
+  font-weight: 700;
+  left: 0;
+  letter-spacing: 0;
+  line-height: 30px;
+  position: absolute;
+  top: 0;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.sign-up .container-3 .c-question {
+  height: 20px;
+  left: 1340px;
+  position: absolute;
+  top: 21px;
+  width: 20px;
+  cursor: pointer;
+}
+.sign-up .container-3 .image-5 {
+  height: 32px;
+  left: 70px;
+  position: absolute;
+  top: 16px;
+  width: 32px;
+  cursor: pointer;
+}
+
+
+

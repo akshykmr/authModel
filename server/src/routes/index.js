@@ -1,16 +1,18 @@
 const express = require("express");
 const authRoutes = require("./authRoute.js");
-const ticketRoutes = require("./otherRoute.js");
+
+// Import other routes here 
+// const otherRoutes = require('path')
 
 const router = express.Router();
 
-// Health check route to verify server status
-router.get("/health-check", (req, res, next) => res.status(200).send("OK"));
+// Route to verify server status
+router.get("/", (req, res) => res.status(200).send("Server Started...., Working!"));
 
 // auth Routes
-router.use("/user", authRoutes);
+router.use("/auth", authRoutes);
 
-// Ticket ROutes
-router.use("/tickets", ticketRoutes);
+// define other routes here
+// router.use("/other", otherRoutes);
 
 module.exports = router;

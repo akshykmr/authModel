@@ -1,9 +1,8 @@
-const userSchema = require("./userModal.js");
-const categorySchema = require("./categoryModel.js");
-const ticketSchema = require("./ticketModal.js");
+const User = require("./userModal.js");
+
+// const OtherModal = require('path')
 
 module.exports = {
-  userSchema,
-  categorySchema,
-  ticketSchema,
+  User,
+  // OtherModal
 };

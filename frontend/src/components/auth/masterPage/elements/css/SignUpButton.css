@@ -1,0 +1,222 @@
+.sign-up .container-2 {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0px 2px 5px #171a1f17, 0px 0px 2px #171a1f1f;
+    height: 540px;
+    left: 747px;
+    position: absolute;
+    top: 180px;
+    width: 519px;
+  }
+  .sign-up .container-2 .let-s-get-started {
+    color: #171a1f;
+    font-family: "Epilogue-Bold", Helvetica;
+    font-size: 32px;
+    font-weight: 700;
+    left: 59px;
+    letter-spacing: 0;
+    line-height: 48px;
+    position: absolute;
+    top: 27px;
+    white-space: nowrap;
+  }
+  .sign-up .container-2 .text-wrapper {
+    color: #9095a0;
+    font-family: "Epilogue-Regular", Helvetica;
+    font-size: 20px;
+    font-weight: 400;
+    left: 58px;
+    letter-spacing: 0;
+    line-height: 30px;
+    position: absolute;
+    top: 79px;
+    white-space: nowrap;
+  }
+  .sign-up .container-2 .text-wrapper-2 {
+    color: #00bdd6;
+    font-family: "Inter-Bold", Helvetica;
+    font-size: 14px;
+    font-weight: 700;
+    left: 325px;
+    letter-spacing: 0;
+    line-height: 22px;
+    position: absolute;
+    top: 501px;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .sign-up .container-2 .text-wrapper-3 {
+    color: #171a1f;
+    font-family: "Inter-Regular", Helvetica;
+    font-size: 14px;
+    font-weight: 400;
+    left: 152px;
+    letter-spacing: 0;
+    line-height: 22px;
+    position: absolute;
+    text-align: right;
+    top: 501px;
+    white-space: nowrap;
+  }
+  .sign-up .container-2 .button {
+    all: unset;
+    background-color: #ffffff;
+    border: 1px solid;
+    border-color: #db4437;
+    border-radius: 8px;
+    box-sizing: border-box;
+    height: 44px;
+    left: 58px;
+    overflow: hidden;
+    position: absolute;
+    top: 204px;
+    width: 404px;
+    cursor: pointer;
+  }
+  .sign-up .container-2 .button .text-wrapper-4 {
+    color: #db4437;
+    font-family: "Inter-Regular", Helvetica;
+    font-size: 16px;
+    font-weight: 400;
+    left: 139px;
+    letter-spacing: 0;
+    line-height: 26px;
+    position: absolute;
+    top: 8px;
+    white-space: nowrap;
+  }
+  .sign-up .container-2 .button .google {
+    height: 20px;
+    left: 113px;
+    position: absolute;
+    top: 12px;
+    width: 20px;
+  }
+  .sign-up .container-2 .button-2 {
+    all: unset;
+    background-color: #ffffff;
+    border: 1px solid;
+    border-color: #4267b2;
+    border-radius: 8px;
+    box-sizing: border-box;
+    height: 44px;
+    left: 58px;
+    overflow: hidden;
+    position: absolute;
+    top: 264px;
+    width: 404px;
+    cursor: pointer;
+  }
+  .sign-up .container-2 .button-2 .text-wrapper-5 {
+    color: #4267b2;
+    font-family: "Inter-Regular", Helvetica;
+    font-size: 16px;
+    font-weight: 400;
+    left: 129px;
+    letter-spacing: 0;
+    line-height: 26px;
+    position: absolute;
+    top: 8px;
+    white-space: nowrap;
+  }
+  .sign-up .container-2 .button-2 .logo-fb-simple {
+    height: 20px;
+    left: 103px;
+    position: absolute;
+    top: 12px;
+    width: 20px;
+  }
+  .sign-up .container-2 .button-3 {
+    all: unset;
+    background-color: #00bdd6;
+    border-radius: 8px;
+    box-sizing: border-box;
+    height: 44px;
+    left: 58px;
+    overflow: hidden;
+    position: absolute;
+    top: 144px;
+    width: 404px;
+    cursor: pointer;
+  }
+  .sign-up .container-2 .button-3 .text-wrapper-6 {
+    color: #ffffff;
+    font-family: "Inter-Regular", Helvetica;
+    font-size: 16px;
+    font-weight: 400;
+    left: 145px;
+    letter-spacing: 0;
+    line-height: 26px;
+    position: absolute;
+    top: 8px;
+    white-space: nowrap;
+    cursor: pointer;
+  
+  }
+  .sign-up .container-2 .button-3 .mail {
+    height: 20px;
+    left: 119px;
+    position: absolute;
+    top: 12px;
+    width: 20px;
+  }
+  .sign-up .container-2 .button-4 {
+    all: unset;
+    background-color: #ffffff;
+    border: 1px solid;
+    border-color: #171a1f;
+    border-radius: 8px;
+    box-sizing: border-box;
+    height: 44px;
+    left: 58px;
+    overflow: hidden;
+    position: absolute;
+    top: 324px;
+    width: 404px;
+    cursor: pointer;
+  }
+  .sign-up .container-2 .button-4 .text-wrapper-7 {
+    color: #171a1f;
+    font-family: "Inter-Regular", Helvetica;
+    font-size: 16px;
+    font-weight: 400;
+    left: 144px;
+    letter-spacing: 0;
+    line-height: 26px;
+    position: absolute;
+    top: 8px;
+    white-space: nowrap;
+  }
+  .sign-up .container-2 .button-4 .apple {
+    height: 20px;
+    left: 118px;
+    position: absolute;
+    top: 12px;
+    width: 20px;
+  }
+  .sign-up .container-2 .by-continuing-you {
+    color: transparent;
+    font-family: "Inter-Regular", Helvetica;
+    font-size: 14px;
+    font-weight: 400;
+    left: 58px;
+    letter-spacing: 0;
+    line-height: 22px;
+    position: absolute;
+    text-align: center;
+    top: 383px;
+    width: 404px;
+  }
+  .sign-up .container-2 .by-continuing-you .span {
+    color: #9095a0;
+  }
+  .sign-up .container-2 .by-continuing-you .text-wrapper-8 {
+    color: #323842;
+    font-family: "Rubik-Medium", Helvetica;
+    font-weight: 500;
+    cursor: pointer;
+  
+  }
+  .sign-up .container-2 .by-continuing-you .text-wrapper-9 {
+    color: #323842;
+  }
