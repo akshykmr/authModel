@@ -49,48 +49,53 @@ const Login = () => {
   console.log(authData, "==");
 
   const registrationWithOtp = async (credentials) => {
-    if (!credentials.email) {
-      toast.warn("Email Required!");
-      return;
-    }
+    // if (!credentials.email) {
+    //   toast.warn("Email Required!");
+    //   return;
+    // }
     // if (credentials.action  && !credentials.password ) {
     //   toast.warn("Password Required");
     //   return;
     // }
-    await authRoute
-      .signUp(credentials)
-      .then((response) => {
-        console.log(response);
-        if (response.data.action === "otpGenerated") {
-          toast.success(`${response.data.message}, : ${response.data.otp}`);
+    // setIsOtpVerified(true);
+
           setOpenDialogBox(true);
-          return;
-        }
-        if (response.data.action === "createPassword") {
-          toast.warn(response.data.message);
-          setIsOtpVerified(true);
-          return;
-        }
-        toast.success(response.data.message);
-        setIsOtpVerified(true);
-      })
-      .catch((error) => {
-        if (error.response) {
-          const { status, data } = error.response;
-          if (
-            status === StatusCodes.CONFLICT &&
-            data.details &&
-            data.details.action === "alreadyExists"
-          ) {
-            setPageState("open_email_login");
-            toast.warn(data.error);
-            console.log(data);
-          }
-        } else {
-          toast.error("An error occurred.");
-        }
-        console.log(error);
-      });
+
+
+    // await authRoute
+    //   .signUp(credentials)
+    //   .then((response) => {
+    //     console.log(response);
+    //     if (response.data.action === "otpGenerated") {
+    //       toast.success(`${response.data.message}, : ${response.data.otp}`);
+    //       setOpenDialogBox(true);
+    //       return;
+    //     }
+    //     if (response.data.action === "createPassword") {
+    //       toast.warn(response.data.message);
+    //       setIsOtpVerified(true);
+    //       return;
+    //     }
+    //     toast.success(response.data.message);
+    //     setIsOtpVerified(true);
+    //   })
+    //   .catch((error) => {
+    //     if (error.response) {
+    //       const { status, data } = error.response;
+    //       if (
+    //         status === StatusCodes.CONFLICT &&
+    //         data.details &&
+    //         data.details.action === "alreadyExists"
+    //       ) {
+    //         setPageState("open_email_login");
+    //         toast.warn(data.error);
+    //         console.log(data);
+    //       }
+    //     } else {
+    //       toast.error("An error occurred.");
+    //     }
+    //     console.log(error);
+    //   });
   };
 
   const verifyOtp = async (authData) => {
@@ -162,6 +167,8 @@ const Login = () => {
       });
   };
 
+  
+
   const actions = {
     signUp_with_google: () => {
       window.open(`${BASE_URL}/auth/login/google`, "_self");
@@ -195,7 +202,7 @@ const Login = () => {
   // ...
 
   const handleClick = async (actionType) => {
-
+alert(actionType)
     const action = actions[actionType];
     if (action) {
       action();

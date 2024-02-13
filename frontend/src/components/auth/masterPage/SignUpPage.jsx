@@ -43,6 +43,21 @@ const SignUpPage = forwardRef(
       otpRefs.current = otpRefs.current.slice(0,  6); // Limit to  6 input fields
     }, []);
 
+    const handleKeyDown = (e, index) => {
+      if (e.key === 'Backspace') {
+        // If the current input is empty, move focus to the previous input field
+        if (e.target.value === '') {
+          otpRefs.current[index -   1]?.focus();
+        } else {
+          // If the current input is not empty, delete the character
+          e.target.value = '';
+          // Move focus to the previous input field
+          otpRefs.current[index -   1]?.focus();
+        }
+        e.preventDefault();
+    }
+  }
+    
     const handleKeyPress = (e, index) => {
       // Prevent non-numeric input
       if (!/[0-9]/.test(e.key) || e.target.value.length >=   1) {
@@ -69,6 +84,8 @@ const SignUpPage = forwardRef(
 
     return (
       <div className="absolute w-[100vw] h-[100vh] top-0 left-0 bg-white shadow-[0px_3px_6px_#120f281f]">
+
+      {/* /---------------------HEADER START ----------------*/}
         <div className=" header w-full h-16 flex items-center justify-between px-4 bg-white shadow-md ">
           <div className="left_logo w-[50%] h-full flex items-center gap-[20px] pl-[50px]">
             <img className=" w-[32px] h-[32px]" alt="Image" src={image6} />
@@ -95,8 +112,14 @@ const SignUpPage = forwardRef(
             />
           </div>
         </div>
+           {/* /---------------------HEADER END ----------------*/}
+
+           {/* /---------------------BODY START ----------------*/}
 
         <div className="body  relative w-[100vw] h-[calc(100vh-64px)] flex flex-row">
+
+           {/* /---------------------LEFT SIDE START ----------------*/}
+
           <div className="  left w-[50%] h-[100%]  flex items-center p-[20px] justify-center">
             <div className="w-[439px] h-[409px]  rounded-[4px] absolute bg-white ">
               <div className="relative w-[431px] h-[396px] top-[6px] left-[4px]">
@@ -140,6 +163,9 @@ const SignUpPage = forwardRef(
               </div>
             </div>
           </div>
+           {/* /---------------------LEFT SIDE END ----------------*/}
+
+           {/* /---------------------RIGHT SIDE  START ----------------*/}
 
           <div className=" right w-[50%] h-[100%]  flex items-center p-[20px] justify-center">
             <div className="w-[519px] h-[540px]  rounded-[8px] shadow-[0px_2px_5px_#171a1f17,0px_0px_2px_#171a1f1f] absolute bg-white ">
@@ -167,6 +193,7 @@ const SignUpPage = forwardRef(
                   ? "Login to your account"
                   : "Sign up your account"}
               </div>
+           {/* /---------------------INPUT BODY START ----------------*/}
 
               {pageState === "open_email_signUp" ||
               pageState === "open_email_login" ? (
@@ -201,7 +228,7 @@ const SignUpPage = forwardRef(
                     )} */}
                     {/*  */}
                   </div>
-                  {(pageState === "open_email_signUp" ||
+                  {((pageState === "open_email_signUp" && isOtpVerified) ||
               pageState === "open_email_login" ) && (
                     <div
                       className={`w-[451px] h-[43px] top-[230px] left-[34px] bg-gray-100 absolute rounded-[8px] ${
@@ -243,12 +270,17 @@ const SignUpPage = forwardRef(
                   >
                     {/* onClick={pageState === "open_email_login"  ? (e) => handleClick("login") : pageState === "open_email_signUp" ? (e) => handleClick("CreateMyAccount"): (e) => handleClick("sendOtp")} */}
                     <div className="absolute [font-family:'Inter-Regular',Helvetica] font-normal text-white text-[16px] tracking-[0] leading-[26px] whitespace-nowrap">
-                      {!isOtpVerified ? "Continue" : "Create my account"}
+                      {(!isOtpVerified || pageState === "open_email_login") ? "Continue" : "Create my account"}
                     </div>
                   </button>
                 </>
+           /* /---------------------INPUT BODY END ----------------*/
+              
               ) : (
                 <>
+
+           {/* /--------------------- LOGIN BUTTONS ON HOMEPAGE START ----------------*/}
+
                   <button
                     className="all-[unset] box-border absolute w-[404px] h-[44px] top-[204px] left-[58px] bg-white rounded-[8px] overflow-hidden border border-solid border-[#db4437] cursor-pointer"
                     onClick={(e) => handleClick("signUp_with_google")}
@@ -302,7 +334,11 @@ const SignUpPage = forwardRef(
                     />
                   </button>
                 </>
+           /* /--------------------- LOGIN BUTTONS ON HOMEPAGE END ----------------*/
               )}
+
+           {/* /--------------------- FOOTER START ----------------*/}
+
               <p className="w-[404px] top-[383px] left-[58px] absolute [font-family:'Inter-Regular',Helvetica] font-normal text-transparent text-[14px] text-center tracking-[0] leading-[22px]">
                 <span className="text-[#9095a0]">
                   By continuing you agree to our
@@ -342,9 +378,15 @@ const SignUpPage = forwardRef(
                   {pageState === "open_email_login" ? "Sing up" : "Log in"}
                 </div>
               </div>
+           {/* /--------------------- FOOTER END ----------------*/}
+
             </div>
           </div>
         </div>
+           {/* /---------------------BODY END ----------------*/}
+
+
+           {/* /---------------------DIALOG BOX FOR OTP  START ----------------*/}
 
         {openOtpDialogBox && (
           <>
@@ -367,7 +409,7 @@ const SignUpPage = forwardRef(
                   name="0"
                   value={authData.otp[0] || ""}
                   onChange={handleOtpChange}
-                
+                  onKeyDown={(e)=>handleKeyDown(e, 0)} tabIndex={0}
                   type="text"
                   onKeyPress={(e) => handleKeyPress(e,  0)}
   ref={(el) => otpRefs.current[0] = el}
@@ -379,6 +421,7 @@ const SignUpPage = forwardRef(
                   name="01"
                   value={authData.otp[1] || ""}
                   onChange={handleOtpChange}
+                  onKeyDown={(e)=>handleKeyDown(e, 1)} tabIndex={1}
                  onKeyPress={(e) => handleKeyPress(e,  1)}
   ref={(el) => otpRefs.current[1] = el}
                   className="w-[48px] h-[48px] top-[158px] left-[154px] rounded-[4px] border border-solid border-[#9095A0] shadow-[0px_0px_1px_#171a1f12,0px_0px_2px_#171a1f1f] absolute bg-white [font-family:'Inter-Bold',Helvetica] font-bold text-[#171a1f] text-[24px] text-center tracking-[0] leading-[36px] whitespace-nowrap"
@@ -388,6 +431,7 @@ const SignUpPage = forwardRef(
                   name="2"
                   value={authData.otp[2] || ""}
                   onChange={handleOtpChange}
+                  onKeyDown={(e)=>handleKeyDown(e, 2)} tabIndex={2}
                  onKeyPress={(e) => handleKeyPress(e,  2)}
   ref={(el) => otpRefs.current[2] = el}
                   className="w-[48px] h-[48px] top-[158px] left-[218px] rounded-[4px] border border-solid border-[#9095A0] shadow-[0px_0px_1px_#171a1f12,0px_0px_2px_#171a1f1f] absolute bg-white [font-family:'Inter-Bold',Helvetica] font-bold text-[#171a1f] text-[24px] text-center tracking-[0] leading-[36px] whitespace-nowrap"
@@ -397,6 +441,7 @@ const SignUpPage = forwardRef(
                   name="3"
                   value={authData.otp[3] || ""}
                   onChange={handleOtpChange}
+                  onKeyDown={(e)=>handleKeyDown(e, 3)} tabIndex={3}
                  onKeyPress={(e) => handleKeyPress(e,  3)}
   ref={(el) => otpRefs.current[3] = el}
                   className="w-[48px] h-[48px] top-[158px] left-[282px] rounded-[4px] border border-solid border-[#9095A0] shadow-[0px_0px_1px_#171a1f12,0px_0px_2px_#171a1f1f] absolute bg-white [font-family:'Inter-Bold',Helvetica] font-bold text-[#171a1f] text-[24px] text-center tracking-[0] leading-[36px] whitespace-nowrap"
@@ -407,6 +452,7 @@ const SignUpPage = forwardRef(
                   name="4"
                   value={authData.otp[4] || ""}
                   onChange={handleOtpChange}
+                  onKeyDown={(e)=>handleKeyDown(e, 4)} tabIndex={4}
                  onKeyPress={(e) => handleKeyPress(e,  4)}
   ref={(el) => otpRefs.current[4] = el}
                   className="w-[48px] h-[48px] top-[158px] left-[346px] rounded-[4px] border border-solid border-[#9095A0] shadow-[0px_0px_1px_#171a1f12,0px_0px_2px_#171a1f1f] absolute bg-white [font-family:'Inter-Bold',Helvetica] font-bold text-[#171a1f] text-[24px] text-center tracking-[0] leading-[36px] whitespace-nowrap"
@@ -416,6 +462,7 @@ const SignUpPage = forwardRef(
                   name="5"
                   value={authData.otp[5] || ""}
                   onChange={handleOtpChange}
+                  onKeyDown={(e)=>handleKeyDown(e, 5)} tabIndex={5}
                  onKeyPress={(e) => handleKeyPress(e,  5)}
   ref={(el) => otpRefs.current[5] = el}
                   className="w-[48px] h-[48px] top-[158px] left-[410px] rounded-[4px] border border-solid border-[#9095A0] shadow-[0px_0px_1px_#171a1f12,0px_0px_2px_#171a1f1f] absolute bg-white [font-family:'Inter-Bold',Helvetica] font-bold text-[#171a1f] text-[24px] text-center tracking-[0] leading-[36px] whitespace-nowrap"
@@ -444,6 +491,9 @@ const SignUpPage = forwardRef(
             </div>
           </>
         )}
+
+           {/* /---------------------DIALOG BOX FOR OTP END ----------------*/}
+
       </div>
     );
   }
