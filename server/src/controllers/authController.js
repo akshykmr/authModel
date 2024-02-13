@@ -5,9 +5,8 @@ const { User } = require("../models");
 
 const { otpService } = require("../service/otpService.js");
 
-
 const StatusCodes = require("http-status-codes");
-const { assert ,createError} = require("../helper/assertError.js");
+const { assert, createError } = require("../helper/assertError.js");
 
 // const generateOtp = async (req, res) => {
 //   try {
@@ -49,57 +48,75 @@ const verifyOtp = async (req, res) => {
   try {
     const { email, otp } = req.body;
     const existingUserWithEmail = await User.findOne({ email });
-    if (!existingUserWithEmail) {
-      return res.json({
-        success: false,
-        message: "User not found",
-      });
-    }
-    if (existingUserWithEmail.otp !== otp) {
-      return res.json({
-        success: false,
-        message: "Invalid OTP",
-      });
-    }
+    assert(
+      email,
+      createError(StatusCodes.CONFLICT, "Please send otp along with email", {
+        action: "frontendError",
+      })
+    );
+    assert(
+      existingUserWithEmail,
+      createError(StatusCodes.NOT_FOUND, "User not found", {
+        action: "emailNotFound",
+      })
+    );
+    assert(
+      existingUserWithEmail.otp === otp,
+      createError(StatusCodes.CONFLICT, "Invalid OTP", {
+        action: "invalidOtp",
+      })
+    );
     existingUserWithEmail.otp = null;
     existingUserWithEmail.is_otpVerified = true;
+    existingUserWithEmail.is_deactivated = true;
     await existingUserWithEmail.save();
     return res.json({
       success: true,
       message: "OTP verified successfully",
+      action : "verified"
     });
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    if (error instanceof Error) {
+      res.status(error.statusCode || 500).json({
+        success: false,
+        error: error.message,
+        details: error.details,
+      });
+    } else {
+      res.status(500).json({ success: false, error: "An error occurred." });
+    }
   }
 };
 
 const registerUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-    // assert(password, createError(StatusCodes.CONFLICT, "Password is required."));
     const existingUserWithEmail = await User.findOne({ email });
 
     if (existingUserWithEmail) {
-      // if (
-      //   existingUserWithEmail.is_otpVerified &&
-      //   !existingUserWithEmail.is_deactivated
-      // ) {
-      //   return res.json({
-      //     success: false,
-      //     message: "User Already Registered",
-      //     action: "alreadyExists",
-      //     is_otpVerified: existingUserWithEmail.is_otpVerified,
-      //   });
-      // } 
-      assert(!existingUserWithEmail.is_otpVerified &&
-        existingUserWithEmail.is_deactivated, createError(StatusCodes.CONFLICT, "User Already Registered", {action : "alreadyExists"}));
+      console.log(
+       
+        (!(existingUserWithEmail.is_otpVerified &&
+        existingUserWithEmail.is_deactivated == false)))
 
-       if (
+        console.log( existingUserWithEmail.is_otpVerified, 'is_otpVerified',)
+        console.log( existingUserWithEmail.is_deactivated, 'is_deactivated',)
+
+
+      assert(
+        (!(existingUserWithEmail.is_otpVerified &&
+          existingUserWithEmail.is_deactivated == false)),
+        createError(StatusCodes.CONFLICT, "User Already Registered, Please Login", {
+          action: "alreadyExists",
+        })
+      );
+      if (
         !existingUserWithEmail.is_otpVerified &&
         existingUserWithEmail.is_deactivated
       ) {
         const otp = await otpService(email);
         existingUserWithEmail.otp = otp;
+        existingUserWithEmail.is_deactivated = true;
         await existingUserWithEmail.save();
         return res.json({
           success: true,
@@ -108,7 +125,8 @@ const registerUser = async (req, res) => {
           action: "otpGenerated",
           is_otpVerified: existingUserWithEmail.is_otpVerified,
         });
-      } else if (
+      } 
+      if (
         existingUserWithEmail.is_otpVerified &&
         existingUserWithEmail.is_deactivated
       ) {
@@ -120,6 +138,7 @@ const registerUser = async (req, res) => {
             is_otpVerified: true,
           });
         }
+        
         const hashedPassword = await bcrypt.hash(password, 10);
         existingUserWithEmail.password = hashedPassword;
         existingUserWithEmail.is_deactivated = false;
@@ -151,10 +170,10 @@ const registerUser = async (req, res) => {
     }
   } catch (error) {
     if (error instanceof Error) {
-      res.status(error.statusCode ||  500).json({
+      res.status(error.statusCode || 500).json({
         success: false,
         error: error.message,
-        details: error.details 
+        details: error.details,
       });
     } else {
       res.status(500).json({ success: false, error: "An error occurred." });
@@ -219,10 +238,7 @@ const loginUser = async (req, res) => {
         message: "Account Blocked",
       });
     }
-    if (
-      !existingUser.is_otpVerified &&
-      existingUser.is_deactivated
-    ) {
+    if (!existingUser.is_otpVerified && existingUser.is_deactivated) {
       const otp = await otpService(query);
       return res.json({
         success: false,
@@ -231,10 +247,8 @@ const loginUser = async (req, res) => {
         otp: otp,
       });
     }
-    if (
-      existingUser.is_otpVerified &&
-      existingUser.is_deactivated
-    ) {
+    if (existingUser.is_otpVerified && existingUser.is_deactivated) {
+      console.log(existingUser.is_otpVerified && existingUser.is_deactivated,existingUser)
       return res.json({
         success: true,
         action: "createPassword",

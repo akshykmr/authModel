@@ -5,7 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 // import { LoginPage } from "../Page";
 import { SignUpPage } from "../masterPage";
 import { authRoute } from "../../../routes";
-import { StatusCodes } from 'http-status-codes';
+import { StatusCodes } from "http-status-codes";
 
 const Login = () => {
   const ref = useRef(null);
@@ -21,6 +21,8 @@ const Login = () => {
   const [isOtpVerified, setIsOtpVerified] = useState(false);
   const [openOtpDialogBox, setOpenDialogBox] = useState(false);
   const [passwordPreview, setPasswordPreview] = useState(false);
+
+  const [pageState, setPageState] = useState("initialPage");
 
   const handleOnChange = (e) => {
     const { name, value } = e.target;
@@ -40,93 +42,159 @@ const Login = () => {
       otp: otpArray.join(""),
     });
   };
+  const handleLocalClick = (actionType) => {
+    setPageState(actionType);
+  };
 
   console.log(authData, "==");
 
-  const handleClick = async (actionType) => {
-    const actions = {
-      signUp_with_google: () =>
-        window.open(`${BASE_URL}/auth/login/google`, "_self"),
-      signUp_with_facebook: () =>
-        window.open(`${BASE_URL}/auth/login/facebook`, "_self"),
-      sendOtp: async () => {
-        if (!authData.email) {
-          toast.warn("Email Required!");
-          return;
-        }
-        await authRoute.signUp({ email: authData.email })
-        .then(response => {
-          console.log(response);
+  const registrationWithOtp = async (credentials) => {
+    if (!credentials.email) {
+      toast.warn("Email Required!");
+      return;
+    }
+    // if (credentials.action  && !credentials.password ) {
+    //   toast.warn("Password Required");
+    //   return;
+    // }
+    await authRoute
+      .signUp(credentials)
+      .then((response) => {
+        console.log(response);
+        if (response.data.action === "otpGenerated") {
           toast.success(`${response.data.message}, : ${response.data.otp}`);
           setOpenDialogBox(true);
-          // setIsOtpVerified(true);
-        })
-        .catch(error => {
-          // Handle error response
-          if (error.response) {
-           
-            const { status, data } = error.response;
-            if (status === StatusCodes.NOT_FOUND) {
-              // If the status code is  404, the password is required
-              toast.error("Password is required.");
-            } else {
-              // For other status codes, display the error message from the server
-              toast.error(data.error || "An error occurred.");
-            }
-          } else if (error.request) {
-            // The request was made but no response was received
-            toast.error("No response from server.");
-          } else {
-            // Something happened in setting up the request that triggered an Error
-            toast.error("Error setting up the request.");
-          }
-          console.log(error);
-        });
-
-        // const response = await fetch(`${BASE_URL}/auth/generateOtp`, {
-        //   method: "POST",
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //   },
-        //   body: JSON.stringify({ email: authData.email }),
-        // });
-        // const data = await response.json();
-        // if (data.success !== true) {
-        //   toast.error(data.message);
-        //   return;
-        // }
-        // console.log(data);
-        // toast.success(data.message);
-        // setOpenDialogBox(true);
-        // setIsOtpVerified(true);
-      },
-      verifyOtp: async () => {
-        if (authData.otp.length !== 6) {
-          toast.warn("Enter Full Otp");
           return;
         }
-        const response = await fetch(`${BASE_URL}/auth/verifyOtp`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email: authData.email, otp: authData.otp }),
-        });
-        const data = await response.json();
-        if (data.success !== true) {
-          toast.error(data.message);
+        if (response.data.action === "createPassword") {
+          toast.warn(response.data.message);
+          setIsOtpVerified(true);
           return;
         }
-        console.log(data);
-        toast.success(data.message);
-        setOpenDialogBox(false);
+        toast.success(response.data.message);
         setIsOtpVerified(true);
-      },
-      CreateMyAccount: () => {},
-      closeDialogBox: () => setOpenDialogBox(false),
-      togglePreviewPass: () => setPasswordPreview(!passwordPreview),
-      // Add more actions here as needed
-    };
+      })
+      .catch((error) => {
+        if (error.response) {
+          const { status, data } = error.response;
+          if (
+            status === StatusCodes.CONFLICT &&
+            data.details &&
+            data.details.action === "alreadyExists"
+          ) {
+            setPageState("open_email_login");
+            toast.warn(data.error);
+            console.log(data);
+          }
+        } else {
+          toast.error("An error occurred.");
+        }
+        console.log(error);
+      });
+  };
+
+  const verifyOtp = async (authData) => {
+    if (authData.otp.length !== 6) {
+      toast.warn("Enter Full Otp");
+      return;
+    }
+    await authRoute
+      .verifyOtp(authData)
+      .then((response) => {
+        console.log(response);
+        toast.success(response.data.message);
+        setIsOtpVerified(true);
+        setOpenDialogBox(false);
+      })
+      .catch((error) => {
+        if (error.response) {
+          const { data } = error.response;
+          if (data.details.action === "frontendError") {
+            setPageState("open_email_signUp");
+          }
+          toast.error(data.error);
+          console.log(data);
+        } else {
+          toast.error("An error occurred.");
+        }
+        console.log(error);
+      });
+  };
+
+  const login = async (credentials) => {
+    if (!credentials.userId) {
+      toast.warn("Email Required!");
+      return;
+    }
+    if (!credentials.password) {
+      toast.warn("Password Required!");
+      return;
+    }
+    // if (credentials.action  && !credentials.password ) {
+    //   toast.warn("Password Required");
+    //   return;
+    // }
+    await authRoute
+      .login(credentials)
+      .then((response) => {
+        console.log(response);
+       
+        toast.success(response.data.message);
+        setIsOtpVerified(true);
+        navigate("/home")
+      })
+      .catch((error) => {
+        if (error.response) {
+          const { status, data } = error.response;
+          if (
+            status === StatusCodes.CONFLICT &&
+            data.details &&
+            data.details.action === "alreadyExists"
+          ) {
+            setPageState("open_email_login");
+            toast.warn(data.error);
+            console.log(data);
+          }
+        } else {
+          toast.error("An error occurred.");
+        }
+        console.log(error);
+      });
+  };
+
+  const actions = {
+    signUp_with_google: () => {
+      window.open(`${BASE_URL}/auth/login/google`, "_self");
+    },
+    signUp_with_facebook: () => {
+      window.open(`${BASE_URL}/auth/login/facebook`, "_self");
+    },
+    sendOtp: () => {
+      registrationWithOtp({ email: authData.email });
+    },
+    verifyOtp: () => {
+      verifyOtp({ email: authData.email, otp: authData.otp });
+    },
+    CreateMyAccount: () => {
+      registrationWithOtp({
+        email: authData.email,
+        password: authData.password,
+      });
+    },
+    login: () => {
+      login({
+        userId: authData.email,
+        password: authData.password,
+      })
+    },
+    closeDialogBox: () => setOpenDialogBox(false),
+    togglePreviewPass: () => setPasswordPreview(!passwordPreview),
+    // Add more actions here as needed
+  };
+
+  // ...
+
+  const handleClick = async (actionType) => {
 
     const action = actions[actionType];
     if (action) {
@@ -202,6 +270,8 @@ const Login = () => {
         openOtpDialogBox={openOtpDialogBox}
         authData={authData}
         handleOtpChange={handleOtpChange}
+        handleLocalClick={handleLocalClick}
+        pageState={pageState}
       />
     </>
   );

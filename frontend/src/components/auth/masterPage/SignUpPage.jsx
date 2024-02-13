@@ -31,7 +31,10 @@ const SignUpPage = forwardRef(
       openOtpDialogBox,
       authData,
       formErrors,
-      handleOtpChange
+      handleOtpChange,
+      handleLocalClick,
+      pageState
+
     },
     ref
   ) => {
@@ -53,11 +56,6 @@ const SignUpPage = forwardRef(
       }
     };
     
-    const [pageState, setPageState] = useState("initialPage");
-
-    const handleLocalClick = (actionType) => {
-      setPageState(actionType);
-    };
 
     const [isInputFocused, setIsInputFocused] = useState(false);
 
@@ -203,7 +201,8 @@ const SignUpPage = forwardRef(
                     )} */}
                     {/*  */}
                   </div>
-                  {(isOtpVerified || pageState === "open_email_login") && (
+                  {(pageState === "open_email_signUp" ||
+              pageState === "open_email_login" ) && (
                     <div
                       className={`w-[451px] h-[43px] top-[230px] left-[34px] bg-gray-100 absolute rounded-[8px] ${
                         isInputFocused === "pass"
@@ -240,8 +239,9 @@ const SignUpPage = forwardRef(
                         ? "top-[282px]"
                         : "top-[220px]"
                     }`}
-                    onClick={!isOtpVerified ? (e) => handleClick("sendOtp") : (e) => handleClick("CreateMyAccount")}
+                    onClick={pageState === "open_email_login"  ? (e) => handleClick("login") : (pageState === "open_email_signUp" && isOtpVerified ) ? (e) => handleClick("CreateMyAccount"):  (e) => handleClick("sendOtp") }
                   >
+                    {/* onClick={pageState === "open_email_login"  ? (e) => handleClick("login") : pageState === "open_email_signUp" ? (e) => handleClick("CreateMyAccount"): (e) => handleClick("sendOtp")} */}
                     <div className="absolute [font-family:'Inter-Regular',Helvetica] font-normal text-white text-[16px] tracking-[0] leading-[26px] whitespace-nowrap">
                       {!isOtpVerified ? "Continue" : "Create my account"}
                     </div>
