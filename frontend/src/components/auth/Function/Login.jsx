@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect,setTimeout } from "react";
+import React, { useState, useRef, useEffect, setTimeout } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -26,7 +26,7 @@ const Login = () => {
 
   const [pageState, setPageState] = useState("initialPage");
 
-  const [error, setError] = useState({})
+  const [error, setError] = useState({});
 
   const handleOnChange = (e) => {
     const { name, value } = e.target;
@@ -51,7 +51,7 @@ const Login = () => {
     if (authData.otp && authData.otp.length === 6) {
       setIsOtpFilled(true);
     } else setIsOtpFilled(false);
-    setError({})
+    setError({});
   }, [authData.otp]);
 
   const handleLocalClick = (actionType) => {
@@ -78,7 +78,7 @@ const Login = () => {
       isValid = false;
     }
 
-    if ((credentials.password || credentials.password === "") && (isOtpVerified || pageState === 'open_email_signUp' )) {
+    if (credentials.password || credentials.password === "") {
       if (!credentials.password) {
         toast.warn("Password is required!");
         isValid = false;
@@ -110,24 +110,23 @@ const Login = () => {
         if (response.data.action === "otpGenerated") {
           toast.success(`${response.data.message}, : ${response.data.otp}`);
           setOpenDialogBox(true);
-    setIsLoading(false);
+          setIsLoading(false);
 
           return;
         }
         if (response.data.action === "createPassword") {
           toast.warn(response.data.message);
-    setIsLoading(false);
-    setIsOtpVerified(true);
+          setIsLoading(false);
+          setIsOtpVerified(true);
           return;
-
         }
         toast.success(response.data.message);
+        setPageState("open_email_login");
         setIsOtpVerified(true);
-    setIsLoading(false);
-
+        setIsLoading(false);
       })
       .catch((error) => {
-    setIsLoading(false);
+        setIsLoading(false);
 
         if (error.response) {
           const { status, data } = error.response;
@@ -155,6 +154,7 @@ const Login = () => {
         console.log(response);
         toast.success(response.data.message);
         setIsOtpVerified(true);
+        setPageState("open_email_signUp");
         setOpenDialogBox(false);
         setIsLoading(false);
       })
@@ -168,9 +168,9 @@ const Login = () => {
           }
           toast.error(data.error);
           setError({
-            errorOn : "otp",
-            message : data.error
-          })
+            errorOn: "otp",
+            message: data.error,
+          });
           console.log(data);
         } else {
           toast.error("An error occurred.");
@@ -184,28 +184,30 @@ const Login = () => {
     await authRoute
       .login(credentials)
       .then((response) => {
-        console.log(response);
-
+        if (response.data.action === "otpGenerated") {
+          toast.success(`${response.data.message} : ${response.data.otp}`);
+          setOpenDialogBox(true);
+          setIsLoading(false);
+          return;
+        }
         toast.success(response.data.message);
         setIsOtpVerified(true);
         setIsLoading(false);
-
         navigate("/home");
       })
       .catch((error) => {
         setIsLoading(false);
-
         if (error.response) {
           const { status, data } = error.response;
           if (
             status === StatusCodes.CONFLICT &&
             data.details &&
-            data.details.action === "alreadyExists"
+            data.details.action === "createPassword"
           ) {
-            setPageState("open_email_login");
             toast.warn(data.error);
-            console.log(data);
-          }
+            setPageState("open_email_signUp");
+            setIsOtpVerified(true);
+          } else toast.error(data.error);
         } else {
           toast.error("An error occurred.");
         }
@@ -254,16 +256,18 @@ const Login = () => {
       });
       if (isFormValid) {
         login({
-          userId: authData.email,
+          email: authData.email,
           password: authData.password,
         });
       }
     },
-    closeDialogBox: () => {setOpenDialogBox(false);
-      setAuthData((preData)=>({
+    closeDialogBox: () => {
+      setOpenDialogBox(false);
+      setAuthData((preData) => ({
         ...preData,
-         otp:""
-      }))},
+        otp: "",
+      }));
+    },
     togglePreviewPass: () => setPasswordPreview(!passwordPreview),
   };
 

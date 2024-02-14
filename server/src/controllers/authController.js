@@ -94,19 +94,11 @@ const registerUser = async (req, res) => {
     const existingUserWithEmail = await User.findOne({ email });
 
     if (existingUserWithEmail) {
-      console.log(
-       
-        (!(existingUserWithEmail.is_otpVerified &&
-        existingUserWithEmail.is_deactivated == false)))
-
-        console.log( existingUserWithEmail.is_otpVerified, 'is_otpVerified',)
-        console.log( existingUserWithEmail.is_deactivated, 'is_deactivated',)
-
 
       assert(
         (!(existingUserWithEmail.is_otpVerified &&
           existingUserWithEmail.is_deactivated == false)),
-        createError(StatusCodes.CONFLICT, "User Already Registered, Please Login", {
+        createError(StatusCodes.CONFLICT, "User already registered, please login", {
           action: "alreadyExists",
         })
       );
@@ -116,6 +108,8 @@ const registerUser = async (req, res) => {
       ) {
         const otp = await otpService(email);
         existingUserWithEmail.otp = otp;
+        const otpExpiryTime = Date.now() +  60 *  1000; // Set OTP to expire in  1 minute
+        existingUserWithEmail.otpExpiry = otpExpiryTime;
         existingUserWithEmail.is_deactivated = true;
         await existingUserWithEmail.save();
         return res.json({
@@ -123,7 +117,6 @@ const registerUser = async (req, res) => {
           message: "OTP has been generated and sent successfully",
           otp: otp,
           action: "otpGenerated",
-          is_otpVerified: existingUserWithEmail.is_otpVerified,
         });
       } 
       if (
@@ -134,8 +127,7 @@ const registerUser = async (req, res) => {
           return res.json({
             success: true,
             action: "createPassword",
-            message: "Otp Already Verified, Please generate Password",
-            is_otpVerified: true,
+            message: "OTP already verified, Please generate password",
           });
         }
         
@@ -145,17 +137,18 @@ const registerUser = async (req, res) => {
         const response = await existingUserWithEmail.save();
         return res.json({
           success: true,
-          message: "User successfully registered",
+          message: "User successfully registered, please login",
           user: response,
           action: "registrationDone",
-          is_otpVerified: existingUserWithEmail.is_otpVerified,
         });
       }
     } else {
       const otp = await otpService(email);
+      const otpExpiryTime = Date.now() +  60 *  1000; // Set OTP to expire in  1 minute
       const user = new User({
         email: email,
         otp: otp,
+        otpExpiry: otpExpiryTime, // Store the OTP expiration time
         is_otpVerified: false,
         is_deactivated: true,
       });
@@ -165,7 +158,6 @@ const registerUser = async (req, res) => {
         message: "OTP has been generated and sent successfully",
         otp: otp,
         action: "otpGenerated",
-        is_otpVerified: false,
       });
     }
   } catch (error) {
@@ -217,57 +209,63 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
   try {
-    const { userId, password } = req.body;
+    const { email, password } = req.body;
 
-    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userId);
+    // const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userId);
 
-    const query = isEmail ? { email: userId } : { phone: userId };
+    // const query = isEmail ? { email: userId } : { phone: userId };
 
-    const existingUser = await User.findOne(query);
+    const existingUser = await User.findOne({email});
+    
+    assert(
+      existingUser,
+      createError(StatusCodes.NOT_FOUND, "Invalid email!", {
+        action: "emailNotFound",
+      })
+    );
 
-    if (!existingUser) {
-      return res.json({
-        success: false,
-        message: `Invalid ${isEmail ? "Email" : "phone"}`,
-      });
-    }
+    assert(
+      !existingUser.is_blocked,
+      createError(StatusCodes.CONFLICT, "Account blocked!", {
+        action: "accountBlocked",
+      })
+    );
 
-    if (existingUser.is_blocked) {
-      return res.json({
-        success: false,
-        message: "Account Blocked",
-      });
-    }
     if (!existingUser.is_otpVerified && existingUser.is_deactivated) {
-      const otp = await otpService(query);
+      const otp = await otpService(email);
+      const otpExpiryTime = Date.now() +  60 *  1000; // Set OTP to expire in  1 minute
+      existingUser.otpExpiry = otpExpiryTime;
+       existingUser.otp = otp;
+      existingUser.is_deactivated = true;
+      await existingUser.save();
       return res.json({
         success: false,
-        message: "Incomplete Registration, Please verify otp",
+        message: "Incomplete registration, please verify otp",
         action: "otpGenerated",
         otp: otp,
       });
     }
-    if (existingUser.is_otpVerified && existingUser.is_deactivated) {
-      console.log(existingUser.is_otpVerified && existingUser.is_deactivated,existingUser)
-      return res.json({
-        success: true,
+
+    assert(
+      !(existingUser.is_otpVerified && existingUser.is_deactivated),
+      createError(StatusCodes.CONFLICT, "Otp verified, please generate Password!", {
         action: "createPassword",
-        message: "Otp Already Verified, Please generate Password",
-        is_otpVerified: true,
-      });
-    }
+      })
+    );
+ 
+
 
     const isPasswordValid = await bcrypt.compare(
       password,
       existingUser.password
     );
 
-    if (!isPasswordValid) {
-      return res.json({
-        success: false,
-        message: "Invalid Password",
-      });
-    }
+    assert(
+      isPasswordValid,
+      createError(StatusCodes.NOT_FOUND, "Invalid Password!", {
+        action: "invalidPassword",
+      })
+    );
 
     const token = await generateJWT(existingUser._id);
     return res.json({
@@ -275,10 +273,18 @@ const loginUser = async (req, res) => {
       message: "Login Success",
       token: token,
       role: existingUser.role,
+      action : "loginSuccess"
     });
   } catch (error) {
-    console.log(error, "error occurred");
-    res.status(500).json({ success: false, message: "Internal Server Error" });
+    if (error instanceof Error) {
+      res.status(error.statusCode || 500).json({
+        success: false,
+        error: error.message,
+        details: error.details,
+      });
+    } else {
+      res.status(500).json({ success: false, error: "An error occurred." });
+    }
   }
 };
 
