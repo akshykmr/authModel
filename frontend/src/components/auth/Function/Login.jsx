@@ -138,6 +138,10 @@ const Login = () => {
             setPageState("open_email_login");
             toast.warn(data.error);
             console.log(data);
+            setError({
+              errorOn: "emailAddress",
+              message: data.error,
+            });
           }
         } else {
           toast.error("An error occurred.");
@@ -307,6 +311,7 @@ const Login = () => {
         isOtpFilled={isOtpFilled}
         isLoading={isLoading}
         error={error}
+        isStrongPassword={isStrongPassword}
       />
     </>
   );
